@@ -1,0 +1,89 @@
+﻿@page "/fetchdata"
+@using NearCompanion.Shared
+@using System.Net
+@using System.Text
+@using Newtonsoft.Json
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (string.IsNullOrEmpty(response))
+{
+    <p><em>Loadingggg...</em></p>
+}
+else
+{
+    <p>@response</p>
+
+    @*<table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+}
+
+@code {
+    private string response = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            while (true)
+            {
+                using var client = new HttpClient();
+
+                var finalizedBlockJSON = "{\"jsonrpc\": \"2.0\", \"id\": \"dontcare\", \"method\": \"block\", \"params\": { \"finality\": \"final\" }}";
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri("https://rpc.mainnet.near.org"),
+                    Content = new StringContent(finalizedBlockJSON, Encoding.ASCII, "application/json")
+                };
+
+                var responseMessage = await client.SendAsync(request);
+
+                response = await responseMessage.Content.ReadAsStringAsync();
+
+                if (response != null)
+                {
+                    dynamic jsonDes = JsonConvert.DeserializeObject(response);
+
+                    if (jsonDes != null)
+                    {
+                        Console.WriteLine($"Latest final block: {jsonDes.result.header.height}");
+                    }
+                }
+
+                await Task.Delay(2000);
+            }
+            
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            
+        }
+    }
+}
