@@ -28,5 +28,5 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
-app.UseCors(builder => builder.WithOrigins("https://webapitest88200.azurewebsites.net").AllowAnyMethod().AllowAnyHeader());
+app.UseCors(builder => builder.WithOrigins("https://nearcompanion.pages.dev/").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
 app.Run();
