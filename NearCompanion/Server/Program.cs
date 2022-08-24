@@ -1,11 +1,16 @@
-using Microsoft.AspNetCore.ResponseCompression;
+using NearCompanion.Server.Services;
+using NearCompanion.Server.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+IRpcService rpcService = new RpcService();
+IBlockService blockService = new BlockService(rpcService);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSingleton<IRpcService>(rpcs => rpcService);
+builder.Services.AddSingleton<IBlockService>(bs => blockService);
 
 var app = builder.Build();
 
