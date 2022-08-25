@@ -1,0 +1,58 @@
+﻿@keyframes initializeBlockAnimation {
+    0% {
+        transform: scaleX(0.1);
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scaleX(1);
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes moveBlocksRightAnimation {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(185px);
+    }
+}
+
+.rightShift {
+    animation: 0.27s linear 0s 1 moveBlocksRightAnimation;
+}
+
+.block {
+    background: #1C6EA4;
+    width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    overflow: hidden;
+    animation: 0.25s ease-in 0s 1 initializeBlockAnimation;
+    margin-left: 35px;
+    -webkit-box-shadow: 5px 5px 0px 0px #289FED, 10px 10px 0px 0px #5FB8FF, 15px 15px 0px 0px #A1D8FF, 20px 20px 0px 0px #CAE6FF, 25px 25px 0px 0px #E1EEFF, 5px 5px 20px 6px rgba(0,0,0,0);
+    box-shadow: 5px 5px 0px 0px #289FED, 10px 10px 0px 0px #5FB8FF, 15px 15px 0px 0px #A1D8FF, 20px 20px 0px 0px #CAE6FF, 25px 25px 0px 0px #E1EEFF, 5px 5px 20px 6px rgba(0,0,0,0);
+}
+
+.blocksContainer {
+    padding: 50px 30px;
+    position: fixed;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    background-color: transparent;
+    justify-content: flex-start;
+    margin: 20px;
+    flex-direction: row-reverse;
+}
+
+.blockHeight 
+{
+    margin-top: 5px;
+    margin-left: 10px;
+    color: white;
+}

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NearCompanion.Server", "Server\NearCompanion.Server.csproj", "{BF407383-7508-4DF0-B569-EB725A956750}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearCompanion.Server", "Server\NearCompanion.Server.csproj", "{BF407383-7508-4DF0-B569-EB725A956750}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NearCompanion.Client", "Client\NearCompanion.Client.csproj", "{C6628F78-A2B6-4AED-BE8D-777A1A948E8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearCompanion.Client", "Client\NearCompanion.Client.csproj", "{C6628F78-A2B6-4AED-BE8D-777A1A948E8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NearCompanion.Shared", "Shared\NearCompanion.Shared.csproj", "{109E93AE-93BD-439F-B11C-6403A583ADC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearCompanion.Shared", "Shared\NearCompanion.Shared.csproj", "{109E93AE-93BD-439F-B11C-6403A583ADC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

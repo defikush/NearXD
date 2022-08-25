@@ -41,18 +41,18 @@ namespace NearCompanion.Server.Services
             }
 
             var block = new BlockModel();
-            double totalGasUsage = 0;
-            double totalGasLimit = 0;
+            decimal totalGasUsage = 0;
+            decimal totalGasLimit = 0;
 
             foreach (var chunk in blockResult.chunks)
             {
                 var chunkModel = new ChunkModel();
                 chunkModel.ShardId = chunk.shard_id;
-                chunkModel.UtilizationPercentage = Math.Round((double)chunk.gas_used / (double)chunk.gas_limit, 3) * 100;
+                chunkModel.UtilizationPercentage = Math.Round((decimal)chunk.gas_used / (decimal)chunk.gas_limit, 2) * 100;
                 block.Chunks.Add(chunkModel);
 
-                totalGasUsage += (double)chunk.gas_used;
-                totalGasLimit += (double)chunk.gas_limit;
+                totalGasUsage += (decimal)chunk.gas_used;
+                totalGasLimit += (decimal)chunk.gas_limit;
             }
 
             block.Author = blockResult.author;
@@ -63,7 +63,7 @@ namespace NearCompanion.Server.Services
 
             if (totalGasLimit > 0)
             {
-                block.UtilizationPercentage = Math.Round(totalGasUsage / totalGasLimit, 3) * 100;
+                block.UtilizationPercentage = Math.Round(totalGasUsage / totalGasLimit, 2) * 100;
             }
 
             return block;
@@ -102,23 +102,27 @@ namespace NearCompanion.Server.Services
                     uint latency = 0;
 
                     var response = await GetBlock(blockHeight);
-                    block = response.Item1;
-                    latency = response.Item2;
 
-                    if (block != null)
+                    if (response != null)
                     {
-                        var previousBlock = blocks.FirstOrDefault(b => b.Height == block.Height - 1);
-
-                        if (previousBlock != null)
-                        {
-                            block.LengthMs = block.TimestampMs - previousBlock.TimestampMs;
-                        }
-
-                        blocks.Add(block);
+                        block = response.Item1;
+                        latency = response.Item2;
                     }
 
+                    if (blocks.FirstOrDefault(b => b.Height == block.Height - 1) is var previousBlock && 
+                        previousBlock != null)
+                    {
+                        block.LengthMs = block.TimestampMs - previousBlock.TimestampMs;
+                    }
+
+                    blocks.Add(block);
+
                     blockHeight++;
-                    await Task.Delay((int)block.LengthMs - (int)latency - 10); //TODO fix latency, check once in a while for the latest block delta
+
+                    if ((int)latency - 10 < (int)block.LengthMs)
+                    {
+                        await Task.Delay((int)block.LengthMs - (int)latency - 10); //TODO fix latency, check once in a while for the latest block delta
+                    }
                 }
             }
             catch (Exception ex)
@@ -130,6 +134,28 @@ namespace NearCompanion.Server.Services
             {
                 //Handle exit
             }
+        }
+
+        public BlockModel? GetIntroductionBlock()
+        {
+            if (blocks.Count >= 5)
+            {
+                return blocks[blocks.Count - 5];
+            }
+
+            return null;
+        }
+
+        public List<BlockModel> GetLatestBlocks(ulong afterHeight)
+        {
+            if (blocks.FirstOrDefault(b => b.Height == afterHeight) is var rootBlock && 
+                rootBlock != null)
+            {
+                var rootIndex = blocks.IndexOf(rootBlock);
+                return blocks.ToList().GetRange(rootIndex, blocks.Count - rootIndex - 1);
+            }
+
+            return new List<BlockModel>();
         }
 
         private void Blocks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -148,6 +174,11 @@ namespace NearCompanion.Server.Services
                             Console.WriteLine($"Chunk {chunk.ShardId}, Utilization: {chunk.UtilizationPercentage}%");
                         }
                     }
+                }
+
+                if (blocks.Count > 30)
+                {
+                    blocks.RemoveAt(0);
                 }
             }
         }

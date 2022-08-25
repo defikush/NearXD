@@ -3,6 +3,7 @@
 @using System.Net
 @using System.Text
 @using Newtonsoft.Json
+@using System.Collections.ObjectModel
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
@@ -11,37 +12,80 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (blocks == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="@GetClassName()">
+        @foreach (var block in blocks)
+        {
+            <div class="block" @key="block">
+                <p class="blockHeight">@block.Height</p>
+            </div>
+        }
+    </div>
 }
 
-@code {
-    private string forecasts;
+@code 
+{
+    [EventHandler("ontransitionend", typeof(EventArgs), enableStopPropagation: true, enablePreventDefault: false)]
+    [EventHandler("onanimationend", typeof(EventArgs), enableStopPropagation: true, enablePreventDefault: false)]
+    public static class EventHandlers { }
+
+    private List<BlockModel> blocks = new List<BlockModel>();
+
+    private bool isInsertingNewBlock = false;
+    string GetClassName() => isInsertingNewBlock ? "blocksContainer rightShift" : "blocksContainer";
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<string>("BlockApi");
+        var firstBlock = await Http.GetFromJsonAsync<Response<BlockModel>>("block");
+        ulong previousHeight = firstBlock.Data.Height;
+        blocks.Add(firstBlock.Data);
+        previousHeight++;
+        this.StateHasChanged();
+
+        while (true)
+        {
+            var block = await Http.GetFromJsonAsync<Response<List<BlockModel>>>($"block/{previousHeight}");
+
+            if (block.Data.Count != 0)
+            {
+                foreach (var newBlock in block.Data)
+                {
+                    Console.WriteLine("Handling new block...");
+                    _ = AddBlockAndHandleAnimations(newBlock, (int)newBlock.LengthMs);
+                    await Task.Delay((int)newBlock.LengthMs);
+                    previousHeight++;
+                }
+            }
+            else
+            {
+                await Task.Delay(1000);
+            }
+        }
+
+        Console.WriteLine("Exited loop");
+    }
+
+    private async Task AddBlockAndHandleAnimations(BlockModel block, int duration)
+    {
+        isInsertingNewBlock = true;
+        this.StateHasChanged();
+
+        await Task.Delay(250);
+
+        blocks.Add(block);
+        this.StateHasChanged();
+        isInsertingNewBlock = false;
+        this.StateHasChanged();
+
+        if (blocks.Count > 10)
+        {
+            blocks.RemoveAt(0);
+            this.StateHasChanged();
+        }
     }
 }
