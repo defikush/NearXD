@@ -21,8 +21,47 @@ else
     <div class="@GetClassName()">
         @foreach (var block in blocks)
         {
+            var author = string.Empty;
+
+            if (!string.IsNullOrEmpty(block.Author))
+            {
+                var split = block.Author.Split('.');
+
+                if (split.Count() > 0)
+                {
+                    author = split[0];
+                }
+            } 
+
+            author = string.IsNullOrEmpty(author) ? "unknown" : author;
+
             <div class="block" @key="block">
-                <p class="blockHeight">@block.Height</p>
+                <span> 
+                    <p class="blockHeight">Block</p>
+                    <button class="blockButton hoverableButton" type="button">@block.Height</button>
+                </span>
+                
+                <div class="block-inner">
+                    <div>
+                        <p class="infoWords">@block.UtilizationPercentage% full</p>
+                        <p class="infoWords">Duration: @(block.LengthMs / 1000f) s</p>
+                    </div>
+
+                    <div class="chunkContainer">
+                        @foreach (var chunk in block.Chunks)
+                        {
+                            <button class="chunkButton hoverableButton" type="button">
+                                <p class="chunkId">Chunk @chunk.ShardId</p>
+                                <p class="chunkFullness">@chunk.UtilizationPercentage% full</p>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <span class="blockFooter"> 
+                    <button class="authorButton hoverableButton" type="button">💼 @author</button>
+                    <p class="footerWords">By</p>
+                </span>
             </div>
         }
     </div>
@@ -30,10 +69,6 @@ else
 
 @code 
 {
-    [EventHandler("ontransitionend", typeof(EventArgs), enableStopPropagation: true, enablePreventDefault: false)]
-    [EventHandler("onanimationend", typeof(EventArgs), enableStopPropagation: true, enablePreventDefault: false)]
-    public static class EventHandlers { }
-
     private List<BlockModel> blocks = new List<BlockModel>();
 
     private bool isInsertingNewBlock = false;
