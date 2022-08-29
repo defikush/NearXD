@@ -12,8 +12,13 @@
     }
 }
 
-.block {
+.intialShift 
+{
     animation: 0.25s ease-in 0s 1 initializeBlockAnimation;
+}
+
+.block {
+    
     display: block;
     flex-direction: column;
 }

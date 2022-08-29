@@ -7,7 +7,6 @@
 @using Newtonsoft.Json
 @using System.Collections.ObjectModel
 @inject HttpClient Http
-@*@inject IBlockService blockService*@
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -20,50 +19,7 @@ else
     <div class="@GetClassName()">
         @foreach (var block in blocks)
         {
-            <Block Model=block/>
-
-            @*var author = string.Empty;
-
-            if (!string.IsNullOrEmpty(block.Author))
-            {
-                var split = block.Author.Split('.');
-
-                if (split.Count() > 0)
-                {
-                    author = split[0];
-                }
-            } 
-
-            author = string.IsNullOrEmpty(author) ? "unknown" : author;
-
-            <div class="block" @key="block">
-                <span> 
-                    <p class="blockHeight">Block</p>
-                    <button class="blockButton hoverableButton" type="button">@block.Height</button>
-                </span>
-                
-                <div class="block-inner">
-                    <div>
-                        <p class="infoWords">@block.UtilizationPercentage% full</p>
-                        <p class="infoWords">Duration: @(block.LengthMs / 1000f) s</p>
-                    </div>
-
-                    <div class="chunkContainer">
-                        @foreach (var chunk in block.Chunks)
-                        {
-                            <button class="chunkButton hoverableButton" type="button">
-                                <p class="chunkId">Chunk @chunk.ShardId</p>
-                                <p class="chunkFullness">@chunk.UtilizationPercentage% full</p>
-                            </button>
-                        }
-                    </div>
-                </div>
-
-                <span class="blockFooter"> 
-                    <button class="authorButton hoverableButton" type="button">💼 @author</button>
-                    <p class="footerWords">By</p>
-                </span>
-            </div>*@
+            <Block Model=block @key="block"/>
         }
     </div>
 }
@@ -91,7 +47,6 @@ else
             {
                 foreach (var newBlock in block.Data)
                 {
-                    Console.WriteLine("Handling new block...");
                     _ = AddBlockAndHandleAnimations(newBlock, (int)newBlock.LengthMs);
                     await Task.Delay((int)newBlock.LengthMs);
                     previousHeight++;
@@ -118,11 +73,10 @@ else
         isInsertingNewBlock = false;
         this.StateHasChanged();
 
-        if (blocks.Count > 50)
+        if (blocks.Count > 10)
         {
-            // TODO fix removal flash
-            blocks.RemoveRange(0, 35);
-            //this.StateHasChanged();
+            blocks.RemoveAt(0);
+            this.StateHasChanged();
         }
     }
 }
