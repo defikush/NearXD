@@ -14,7 +14,7 @@ namespace NearCompanion.Client.Services
         private HttpClient httpClient;
         private bool keepQueryingBlocks = true;
 
-        public event EventHandler<List<BlockModel>> NewBlocksReceivedEvent;
+        public event EventHandler<List<BlockModel>>? NewBlocksReceivedEvent;
 
         public async Task StartReceivingBlocks()
         {
@@ -28,28 +28,32 @@ namespace NearCompanion.Client.Services
                 return;
             }
 
-            ulong previousHeight = finalBlockResponse.Data.Height;
+            ulong previousHeight = finalBlockResponse.Data.Height + 1;
 
             NewBlocksReceivedEvent?.Invoke(null, new List<BlockModel>() { finalBlockResponse.Data });
-
-            previousHeight++;
 
             while (keepQueryingBlocks)
             {
                 var latestBlocksResponse = await httpClient.GetFromJsonAsync<Response<List<BlockModel>>>($"block/{previousHeight}");
 
-                if (latestBlocksResponse.Data.Count != 0)
+                if (latestBlocksResponse == null || 
+                    !latestBlocksResponse.Success || 
+                    latestBlocksResponse.Data == null || 
+                    latestBlocksResponse.Data.Count == 0)
                 {
-                    foreach (var newBlock in latestBlocksResponse.Data)
-                    {
-                        //_ = AddBlockAndHandleAnimations(newBlock, (int)newBlock.LengthMs);
-                        previousHeight++;
-                    }
+                    await Task.Delay(2000);
+                    continue;
                 }
-                else
+
+                foreach (var newBlock in latestBlocksResponse.Data)
                 {
-                    await Task.Delay(1000);
+                    //_ = AddBlockAndHandleAnimations(newBlock, (int)newBlock.LengthMs);
+                    previousHeight++;
                 }
+
+                NewBlocksReceivedEvent?.Invoke(null, latestBlocksResponse.Data);
+
+                await Task.Delay(5000);
             }
         }
 

@@ -1,16 +1,15 @@
-﻿@page "/fetchdata"
+﻿@page "/"
+@using NearCompanion.Client.Services.Interfaces
 @using NearCompanion.Shared
+@using NearCompanion.Client.Components
 @using System.Net
 @using System.Text
 @using Newtonsoft.Json
 @using System.Collections.ObjectModel
 @inject HttpClient Http
+@*@inject IBlockService blockService*@
 
 <PageTitle>Weather forecast</PageTitle>
-
-<h1>Weather forecast</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
 
 @if (blocks == null)
 {
@@ -21,7 +20,9 @@ else
     <div class="@GetClassName()">
         @foreach (var block in blocks)
         {
-            var author = string.Empty;
+            <Block Model=block/>
+
+            @*var author = string.Empty;
 
             if (!string.IsNullOrEmpty(block.Author))
             {
@@ -62,7 +63,7 @@ else
                     <button class="authorButton hoverableButton" type="button">💼 @author</button>
                     <p class="footerWords">By</p>
                 </span>
-            </div>
+            </div>*@
         }
     </div>
 }
@@ -117,10 +118,11 @@ else
         isInsertingNewBlock = false;
         this.StateHasChanged();
 
-        if (blocks.Count > 10)
+        if (blocks.Count > 50)
         {
-            blocks.RemoveAt(0);
-            this.StateHasChanged();
+            // TODO fix removal flash
+            blocks.RemoveRange(0, 35);
+            //this.StateHasChanged();
         }
     }
 }

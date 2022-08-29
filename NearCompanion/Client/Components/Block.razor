@@ -1,0 +1,31 @@
+﻿<div class="block" @key="Model">
+    <span> 
+        <p class="blockHeight">Block</p>
+        <button class="blockButton hoverableButton" type="button">@Model?.Height</button>
+    </span>
+                
+    <div class="block-inner">
+        <div>
+            <p class="infoWords">@Model?.UtilizationPercentage% full</p>
+            <p class="infoWords">Duration: @(Model?.LengthMs / 1000f) s</p>
+        </div>
+
+        <div>
+            @if (Model != null && Model.Chunks != null)
+            {
+                foreach (var chunk in Model.Chunks)
+                {
+                    <button class="chunkButton hoverableButton" type="button">
+                        <p class="chunkId">Chunk @chunk.ShardId</p>
+                        <p class="chunkFullness">@chunk.UtilizationPercentage% full</p>
+                    </button>
+                }
+            }
+        </div>
+    </div>
+
+    <span class="blockFooter"> 
+        <button class="authorButton hoverableButton" type="button">💼 @GetAuthorTrimmed()</button>
+        <p class="footerWords">By</p>
+    </span>
+</div>

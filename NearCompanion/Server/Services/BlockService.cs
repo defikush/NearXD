@@ -48,7 +48,7 @@ namespace NearCompanion.Server.Services
             {
                 var chunkModel = new ChunkModel();
                 chunkModel.ShardId = chunk.shard_id;
-                chunkModel.UtilizationPercentage = Math.Round(((decimal)chunk.gas_used / (decimal)chunk.gas_limit) * 100, 2);
+                chunkModel.UtilizationPercentage = Math.Round(((decimal)chunk.gas_used / (decimal)chunk.gas_limit) * 100, 1);
                 block.Chunks.Add(chunkModel);
 
                 totalGasUsage += (decimal)chunk.gas_used;
@@ -63,7 +63,7 @@ namespace NearCompanion.Server.Services
 
             if (totalGasLimit > 0)
             {
-                block.UtilizationPercentage = Math.Round((totalGasUsage / totalGasLimit) * 100, 2);
+                block.UtilizationPercentage = Math.Round((totalGasUsage / totalGasLimit) * 100, 1);
             }
 
             return block;
