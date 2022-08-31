@@ -82,3 +82,7 @@ main {
         padding-right: 1.5rem !important;
     }
 }
+
+.logo {
+    max-width: 150px;
+}

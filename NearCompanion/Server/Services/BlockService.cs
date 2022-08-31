@@ -69,7 +69,7 @@ namespace NearCompanion.Server.Services
             return block;
         }
 
-        private async Task<Tuple<BlockModel?, uint>> GetBlock(ulong height = 0)
+        private async Task<Tuple<BlockModel?, uint>?> GetBlock(ulong height = 0)
         {
             try
             {
@@ -98,12 +98,12 @@ namespace NearCompanion.Server.Services
             {
                 while (keepPolling)
                 {
-                    BlockModel? block = new BlockModel();
+                    BlockModel block = new BlockModel();
                     uint latency = 0;
 
                     var response = await GetBlock(blockHeight);
 
-                    if (response != null)
+                    if (response != null && response.Item1 != null)
                     {
                         block = response.Item1;
                         latency = response.Item2;
