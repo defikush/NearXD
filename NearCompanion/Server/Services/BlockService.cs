@@ -2,6 +2,7 @@
 using NearCompanion.Server.Services.Interfaces;
 using NearCompanion.Shared;
 using System.Collections.ObjectModel;
+using System.Timers;
 
 namespace NearCompanion.Server.Services
 {
@@ -17,6 +18,11 @@ namespace NearCompanion.Server.Services
         private IRpcService rpcService;
         private bool keepPolling = true;
         private ObservableCollection<BlockModel> blocks = new ObservableCollection<BlockModel>();
+        private double blockTimeAverageMs = 1000;
+        private ulong currentPollHeight = 0;
+        private float pollSpeedCoefficient = 1;
+        private uint pollRebasementDelayMs = 0;
+        private System.Timers.Timer heightWatchdogTimer;
 
         private async Task Initialize()
         {
@@ -24,13 +30,155 @@ namespace NearCompanion.Server.Services
 
             await Task.Delay(2000);
 
-            if (response.Item1 == null)
+            if (response == null || response.Item1 == null)
             {
                 _ = Initialize();
                 return;
             }
 
             _ = PollBlocks(response.Item1.Height + 1);
+        }
+
+        private async Task<Tuple<BlockModel?, uint>?> GetBlock(ulong height = 0)
+        {
+            try
+            {
+                var content = height == 0 ? RpcJsonHelpers.GetLatestFinalBlockJson() : RpcJsonHelpers.GetBlockJson(height);
+                var rpcResponse = await rpcService.MakePostRequest(content);
+
+                if (rpcResponse == null ||
+                    rpcResponse.Result == null)
+                {
+                    return null;
+                }
+                else if (rpcResponse.IsError)
+                {
+                    Console.WriteLine($"Error received when polling for block {height}: {rpcResponse.ErrorMessage}");
+                }
+
+                return Tuple.Create(ReadBlockFromResponse(rpcResponse.Result), rpcResponse.Latency);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
+
+        private async Task PollBlocks(ulong blockHeight)
+        {
+            try
+            {
+                currentPollHeight = blockHeight;
+                StartHeightWatchdog();
+
+                while (keepPolling)
+                {
+                    BlockModel block = new BlockModel();
+                    uint latency = 0;
+
+                    var response = await GetBlock(currentPollHeight);
+
+                    if (response != null && response.Item1 != null)
+                    {
+                        block = response.Item1;
+                        latency = response.Item2;
+                    }
+
+                    if (blocks.FirstOrDefault(b => b.Height == block.Height - 1) is var previousBlock && 
+                        previousBlock != null)
+                    {
+                        block.LengthMs = (uint)(block.TimestampMs - previousBlock.TimestampMs);
+                    }
+
+                    blocks.Add(block);
+                    currentPollHeight++;
+                    var timeUntilNextPoll = (double)(block.LengthMs - latency + pollRebasementDelayMs) / pollSpeedCoefficient;
+                    Console.WriteLine($"Next poll height: {currentPollHeight}, awaiting {timeUntilNextPoll}");
+
+                    if (timeUntilNextPoll > 50000)
+                    {
+                        Console.WriteLine("Time until next poll very high ||||||||||||||||||||||||||||||||||");
+                        Console.WriteLine($"block.LengthMs: {block.LengthMs}");
+                        Console.WriteLine($"latency: {latency}");
+                        Console.WriteLine($"pollRebasementDelayMs: {pollRebasementDelayMs}");
+                        Console.WriteLine($"pollSpeedCoefficient: {pollSpeedCoefficient}");
+                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+                    }
+
+                    if (timeUntilNextPoll > 0)
+                    {
+                        await Task.Delay((int)timeUntilNextPoll); //TODO fix latency, check once in a while for the latest block delta
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+
+            }
+            finally
+            {
+                _ = Initialize();
+            }
+        }
+
+        private void StartHeightWatchdog()
+        {
+            if (heightWatchdogTimer != null)
+            {
+                heightWatchdogTimer.Stop();
+                heightWatchdogTimer.Close();
+            }
+
+            heightWatchdogTimer = new System.Timers.Timer();
+            heightWatchdogTimer.Interval = 10000;
+            heightWatchdogTimer.Elapsed += HeightWatchdogElapsed;
+            heightWatchdogTimer.AutoReset = true;
+            heightWatchdogTimer.Enabled = true;
+        }
+
+        private void HeightWatchdogElapsed(object? sender, ElapsedEventArgs e)
+        {
+            _ = ReadjustHeight();
+        }
+
+        private async Task ReadjustHeight()
+        {
+            try
+            {
+                var response = await GetBlock();
+
+                if (response != null && response.Item1 != null)
+                {
+                    var heightDelta = (int)(response.Item1.Height - currentPollHeight);
+
+                    Console.WriteLine($"[WATCHDOG] =============================================================================================================== CURRENT DELTA: {heightDelta}");
+
+                    // Final block is higher than current poll
+                    if (heightDelta >= 5)
+                    {
+                        pollRebasementDelayMs = 0;
+                        pollSpeedCoefficient *= 1.2f;
+                        return;
+                    }
+                    
+                    // Final block is lower than current poll
+                    if (heightDelta < 0)
+                    {
+                        pollSpeedCoefficient = 1;
+                        pollRebasementDelayMs = (uint)(Math.Abs(heightDelta) * (uint)blockTimeAverageMs);
+                        return;
+                    }
+
+                    pollSpeedCoefficient = 1;
+                    pollRebasementDelayMs = 0;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         private BlockModel? ReadBlockFromResponse(dynamic? blockResult)
@@ -69,73 +217,6 @@ namespace NearCompanion.Server.Services
             return block;
         }
 
-        private async Task<Tuple<BlockModel?, uint>?> GetBlock(ulong height = 0)
-        {
-            try
-            {
-                var content = height == 0 ? RpcJsonHelpers.GetLatestFinalBlockJson() : RpcJsonHelpers.GetBlockJson(height);
-                var rpcResponse = await rpcService.MakePostRequest(content);
-
-                if (rpcResponse.IsError ||
-                    rpcResponse == null ||
-                    rpcResponse.Result == null)
-                {
-                    return null;
-                }
-
-                return Tuple.Create(ReadBlockFromResponse(rpcResponse.Result), rpcResponse.Latency);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
-        }
-
-        private async Task PollBlocks(ulong blockHeight)
-        {
-            try
-            {
-                while (keepPolling)
-                {
-                    BlockModel block = new BlockModel();
-                    uint latency = 0;
-
-                    var response = await GetBlock(blockHeight);
-
-                    if (response != null && response.Item1 != null)
-                    {
-                        block = response.Item1;
-                        latency = response.Item2;
-                    }
-
-                    if (blocks.FirstOrDefault(b => b.Height == block.Height - 1) is var previousBlock && 
-                        previousBlock != null)
-                    {
-                        block.LengthMs = block.TimestampMs - previousBlock.TimestampMs;
-                    }
-
-                    blocks.Add(block);
-
-                    blockHeight++;
-
-                    if ((int)latency - 10 < (int)block.LengthMs)
-                    {
-                        await Task.Delay((int)block.LengthMs - (int)latency - 10); //TODO fix latency, check once in a while for the latest block delta
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-
-            }
-            finally
-            {
-                //Handle exit
-            }
-        }
-
         public BlockModel? GetIntroductionBlock()
         {
             if (blocks.Count >= 5)
@@ -162,17 +243,22 @@ namespace NearCompanion.Server.Services
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
+                if (e.NewItems == null)
+                {
+                    return;
+                }
+
                 foreach (var newItem in e.NewItems)
                 {
                     if (newItem is BlockModel newBlock)
                     {
                         Console.WriteLine($"New block: {newBlock.Height}, Author: {newBlock.Author}, Length: {newBlock.LengthMs}, Utilization: {newBlock.UtilizationPercentage}%. ");
-                        Console.WriteLine($"Containing the chunks: ");
+                        //Console.WriteLine($"Containing the chunks: ");
 
-                        foreach (var chunk in newBlock.Chunks)
-                        {
-                            Console.WriteLine($"Chunk {chunk.ShardId}, Utilization: {chunk.UtilizationPercentage}%");
-                        }
+                        //foreach (var chunk in newBlock.Chunks)
+                        //{
+                        //    Console.WriteLine($"Chunk {chunk.ShardId}, Utilization: {chunk.UtilizationPercentage}%");
+                        //}
                     }
                 }
 
@@ -180,6 +266,8 @@ namespace NearCompanion.Server.Services
                 {
                     blocks.RemoveAt(0);
                 }
+
+                blockTimeAverageMs = blocks.Average(b => (long)b.LengthMs);
             }
         }
     }

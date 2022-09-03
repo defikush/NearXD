@@ -5,7 +5,7 @@
         public string Author { get; set; } = string.Empty;
         public string Hash { get; set; } = string.Empty;
         public ulong Height { get; set; }
-        public ulong LengthMs { get; set; } = 1000;
+        public uint LengthMs { get; set; } = 1000;
         public ulong GasPrice { get; set; }
         public decimal UtilizationPercentage { get; set; }
         public ulong TimestampMs { get; set; }
