@@ -6,9 +6,9 @@
 
 main {
     flex: 1;
-    background: #ECE9E6; /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    /*background: #ECE9E6;*/ /* fallback for old browsers */
+    /*background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6);*/ /* Chrome 10-25, Safari 5.1-6 */
+    /*background: linear-gradient(to right, #FFFFFF, #ECE9E6);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 .sidebar {
@@ -84,5 +84,28 @@ main {
 }
 
 .logo {
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.2s;
     max-width: 120px;
+}
+
+#top-bar {
+    border-radius: 21px;
+    -webkit-box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.2);
+    box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.2);
+    background: radial-gradient( circle farthest-corner at 7.2% 13.6%, #e1e5f2 0%, #e1e5f2 100% );
+    /*background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);*/
+    /*border: 3px;
+    border-color: rgba(37,249,245,1);*/
+}
+
+.hoverable:hover {
+    transform: scale(1.1,1.1);
+    -webkit-transform: scale(1.1,1.1);
+    -moz-transform: scale(1.1,1.1);
+}
+
+.hoverable {
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.2s;
 }

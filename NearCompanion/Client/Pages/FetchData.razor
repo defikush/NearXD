@@ -16,11 +16,31 @@
 }
 else
 {
-    <div class="@GetClassName()">
-        @foreach (var block in blocks)
-        {
-            <Block Model=block @key="block"/>
-        }
+    <div class="wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                </div>
+
+                <div class="col-sm-8 d-flex justify-content-center align-items-center">
+                    <button @onclick="HandlePlayPause" 
+                            id="stop-button" 
+                            class="xd-button hoverableButton d-flex justify-content-center align-items-center">
+                        @currentPlayPauseText
+                    </button>
+                </div>
+
+                <div class="col-sm-2">
+                </div>
+            </div>
+        </div>
+
+        <div class="@GetClassName()">
+            @foreach (var block in blocks)
+            {
+                <Block Model=block @key="block"/>
+            }
+        </div>
     </div>
 }
 
@@ -30,6 +50,10 @@ else
 
     private bool isInsertingNewBlock = false;
     string GetClassName() => isInsertingNewBlock ? "blocksContainer rightShift" : "blocksContainer";
+    private bool isRunning = true;
+    private const string STOP_TEXT = "⏸ Pause";
+    private const string PLAY_TEXT = "▶ Resume";
+    private string currentPlayPauseText = STOP_TEXT;
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,7 +61,7 @@ else
         ulong previousHeight = firstBlock.Data.Height;
         blocks.Add(firstBlock.Data);
         previousHeight++;
-        this.StateHasChanged();
+        AnnounceStateHasChanged();
 
         while (true)
         {
@@ -64,19 +88,35 @@ else
     private async Task AddBlockAndHandleAnimations(BlockModel block, int duration)
     {
         isInsertingNewBlock = true;
-        this.StateHasChanged();
+        AnnounceStateHasChanged();
 
         await Task.Delay(250);
 
         blocks.Add(block);
-        this.StateHasChanged();
+        AnnounceStateHasChanged();
         isInsertingNewBlock = false;
-        this.StateHasChanged();
+        AnnounceStateHasChanged();
 
         if (blocks.Count > 10)
         {
             blocks.RemoveAt(0);
-            this.StateHasChanged();
+            AnnounceStateHasChanged();
         }
     }
+
+    private void HandlePlayPause()
+    {
+        isRunning = !isRunning;
+        currentPlayPauseText = isRunning ? STOP_TEXT : PLAY_TEXT;
+        StateHasChanged();
+    }
+
+    private void AnnounceStateHasChanged()
+    {
+        if (isRunning)
+        {
+            StateHasChanged();
+        }
+    }
+
 }

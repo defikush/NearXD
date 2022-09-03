@@ -1,16 +1,33 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    @*<div class="sidebar">
-        <NavMenu />
-    </div>*@
-
     <main>
-        <div class="container-fluid alert alert-primary my-0 py-0">
-            <img class="logo" src="/NearXDLogo.png">
+        <div id="top-bar" class="container mt-3 py-0">
+            <div class="row">
+                <div class="col-sm-2 d-flex justify-content-center align-items-center">
+                    <img class="logo hoverable" src="/NearXDLogo.png">
+                </div>
+
+                <div class="col-sm-8 d-flex justify-content-center align-items-center">
+                    <ul class="nav d-flex justify-content-center align-items-center">
+                      <li class="nav-item">
+                        <a class="nav-link active hoverable" href="#">🧱 Blocks</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link disabled" href="#">📰 (soon)</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link disabled" href="#">💼 (soon)</a>
+                      </li>
+                    </ul>
+                </div>
+
+                <div class="col-sm-2">
+                </div>
+            </div>
         </div>
 
-        <article class="content">
+        <article class="content align-middle">
             @Body
         </article>
     </main>

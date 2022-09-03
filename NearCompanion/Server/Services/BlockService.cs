@@ -159,7 +159,7 @@ namespace NearCompanion.Server.Services
                     if (heightDelta >= 5)
                     {
                         pollRebasementDelayMs = 0;
-                        pollSpeedCoefficient *= 1.2f;
+                        pollSpeedCoefficient = Math.Min(pollSpeedCoefficient * 1.2f, 1.5f);
                         return;
                     }
                     
