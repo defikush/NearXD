@@ -43,8 +43,8 @@
     font-weight: 400;
     background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
     color: black;
-    -webkit-box-shadow: 2px 3px 0px 0px #5FB8FF, 5px 5px 15px 5px rgba(0,0,0,0);
-    box-shadow: 2px 3px 0px 0px #5FB8FF, 5px 5px 15px 5px rgba(0,0,0,0);
+    -webkit-box-shadow: 3px 3px 0px 0px #CAE6FF, 5px 5px 15px 5px rgba(0,0,0,0);
+    box-shadow: 3px 3px 0px 0px #CAE6FF, 5px 5px 15px 5px rgba(0,0,0,0);
     text-align: center;
 }
 

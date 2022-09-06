@@ -90,13 +90,10 @@ main {
 }
 
 #top-bar {
-    border-radius: 21px;
-    -webkit-box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.2);
-    box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.2);
-    background: radial-gradient( circle farthest-corner at 7.2% 13.6%, #e1e5f2 0%, #e1e5f2 100% );
-    /*background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);*/
-    /*border: 3px;
-    border-color: rgba(37,249,245,1);*/
+    border-radius: 0px 0px 31px 30px;
+    -webkit-box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.15);
+    box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.15);
+    background: radial-gradient( circle farthest-corner at 7.2% 13.6%, #e1e5f2 0%, #e1e1f2 100% );
 }
 
 .hoverable:hover {
