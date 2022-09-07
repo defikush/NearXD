@@ -1,12 +1,18 @@
 ﻿@keyframes initializeBlockAnimation {
     0% {
-        transform: scaleX(0.1);
         transform: translateX(-100%);
         opacity: 0;
     }
 
+    50% {
+        transform: translateX(10%)
+    }
+
+    75% {
+        transform: translateX(-5%)
+    }
+
     100% {
-        transform: scaleX(1);
         transform: translateX(0);
         opacity: 1;
     }
@@ -90,6 +96,13 @@
 }
 
 .hoverableButton:hover {
+    box-shadow: 3px 3px 0px 0px #5FB8FF, 0 12px 16px 0 #CAE6FF, 0 17px 50px 0 #CAE6FF;
+    transform: scale(1.1,1.1);
+    -webkit-transform: scale(1.1,1.1);
+    -moz-transform: scale(1.1,1.1);
+}
+
+.hoverableButtonBlack:hover {
     box-shadow: 3px 3px 0px 0px #5FB8FF, 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
     transform: scale(1.1,1.1);
     -webkit-transform: scale(1.1,1.1);

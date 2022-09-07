@@ -18,7 +18,7 @@ namespace NearCompanion.Server.Services
         private readonly string nullError = "The RPC server response was null";
         private readonly string unableError = "Unable to read the Rpc response";
 
-        public Uri RpcUri => new Uri("https://rpc.mainnet.near.org");
+        public Uri RpcUri => new Uri("https://public-rpc.blockpi.io/http/near"); //new Uri("https://rpc.mainnet.near.org");
 
         public async Task<RpcResponse> MakePostRequest(string content)
         {
