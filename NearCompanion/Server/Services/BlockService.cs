@@ -46,14 +46,19 @@ namespace NearCompanion.Server.Services
                 var content = height == 0 ? RpcJsonHelpers.GetLatestFinalBlockJson() : RpcJsonHelpers.GetBlockJson(height);
                 var rpcResponse = await rpcService.MakePostRequest(content);
 
-                if (rpcResponse == null ||
-                    rpcResponse.Result == null)
+                if (rpcResponse == null)
+                {
+                    return null;
+                }
+                else if (rpcResponse.Result == null)
                 {
                     return null;
                 }
                 else if (rpcResponse.IsError)
                 {
                     Console.WriteLine($"Error received when polling for block {height}: {rpcResponse.ErrorMessage}");
+                    return new Tuple<BlockModel?, uint>(new BlockModel() { BlockError = rpcResponse.RpcResult }, 
+                                                        rpcResponse.Latency);
                 }
 
                 return Tuple.Create(ReadBlockFromResponse(rpcResponse.Result), rpcResponse.Latency);
@@ -93,7 +98,13 @@ namespace NearCompanion.Server.Services
 
                     blocks.Add(block);
                     currentPollHeight++;
-                    var timeUntilNextPoll = (double)(block.LengthMs - latency + pollRebasementDelayMs) / pollSpeedCoefficient;
+
+                    if (latency > block.LengthMs)
+                    {
+                        latency = block.LengthMs;
+                    }
+
+                    var timeUntilNextPoll = (double)(blockTimeAverageMs - latency + pollRebasementDelayMs) / pollSpeedCoefficient;
                     Console.WriteLine($"Next poll height: {currentPollHeight}, awaiting {timeUntilNextPoll}");
 
                     if (timeUntilNextPoll > 50000)
@@ -132,7 +143,7 @@ namespace NearCompanion.Server.Services
             }
 
             heightWatchdogTimer = new System.Timers.Timer();
-            heightWatchdogTimer.Interval = 10000;
+            heightWatchdogTimer.Interval = 5000;
             heightWatchdogTimer.Elapsed += HeightWatchdogElapsed;
             heightWatchdogTimer.AutoReset = true;
             heightWatchdogTimer.Enabled = true;
@@ -217,17 +228,34 @@ namespace NearCompanion.Server.Services
             return block;
         }
 
-        public BlockModel? GetIntroductionBlock()
+        public Response<BlockModel> GetIntroductionBlock()
         {
-            if (blocks.Count >= 5)
+            if (blocks.Count == 0)
             {
-                return blocks[blocks.Count - 5];
+                return new Response<BlockModel>()
+                {
+                    Data = blocks[blocks.Count - 5],
+                    Error = Errors.NoBlocks
+                };
             }
-
-            return null;
+            else if (blocks.Count >= 5)
+            {
+                return new Response<BlockModel>() 
+                {
+                    Data = blocks[blocks.Count - 5],
+                };
+            }
+            else
+            {
+                return new Response<BlockModel>()
+                {
+                    Data = null,
+                    Error = Errors.NotEnoughBlocks
+                };
+            }
         }
 
-        public List<BlockModel> GetLatestBlocks(ulong afterHeight)
+        public List<BlockModel> GetLatestBlocks(ulong afterHeight, ref Errors result)
         {
             if (blocks.FirstOrDefault(b => b.Height == afterHeight) is var rootBlock && 
                 rootBlock != null)
@@ -236,6 +264,7 @@ namespace NearCompanion.Server.Services
                 return blocks.ToList().GetRange(rootIndex, blocks.Count - rootIndex - 1);
             }
 
+            result = Errors.UnknownBlock;
             return new List<BlockModel>();
         }
 

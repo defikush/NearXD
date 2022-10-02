@@ -1,7 +1,9 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
 using NearCompanion.Server.Helpers;
 using NearCompanion.Server.Services.Interfaces;
+using NearCompanion.Shared;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Text;
 
@@ -9,16 +11,7 @@ namespace NearCompanion.Server.Services
 {
     public class RpcService : IRpcService
     {
-        public RpcService()
-        {
-
-        }
-
-        private readonly string unknownError = "Unknown RPC Error";
-        private readonly string nullError = "The RPC server response was null";
-        private readonly string unableError = "Unable to read the Rpc response";
-
-        public Uri RpcUri => new Uri("https://public-rpc.blockpi.io/http/near"); //new Uri("https://rpc.mainnet.near.org");
+        public Uri RpcUri => new Uri("https://rpc.mainnet.near.org");
 
         public async Task<RpcResponse> MakePostRequest(string content)
         {
@@ -36,7 +29,7 @@ namespace NearCompanion.Server.Services
                         Content = new StringContent(content, Encoding.ASCII, "application/json")
                     };
 
-                    var responseMessage = await client.SendAsync(request);
+                    var responseMessage = await client.SendAsync(request).WithTimeout(4000);
 
                     var rawResponse = await responseMessage.Content.ReadAsStringAsync();
 
@@ -46,28 +39,35 @@ namespace NearCompanion.Server.Services
 
                         if (response != null)
                         {
-                            return new RpcResponse(response.result, false, null, (uint)latencyStopwatch.ElapsedMilliseconds);
+                            return new RpcResponse(response.result,
+                                                   Errors.None,
+                                                   (uint)latencyStopwatch.ElapsedMilliseconds);
                         }
                         else
                         {
-                            return new RpcResponse(null, true, nullError, 0);
+                            return new RpcResponse(null, Errors.DeserializationError, (uint)latencyStopwatch.ElapsedMilliseconds);
                         }
                     }
                     else
                     {
-                        return new RpcResponse(null, true, nullError, 0);
+                        return new RpcResponse(null, Errors.NullResponse, (uint)latencyStopwatch.ElapsedMilliseconds);
                     }
                 }
+            }
+            catch (TimeoutException te)
+            {
+                Console.WriteLine(te);
+                return new RpcResponse(null, Errors.Timeout, (uint)latencyStopwatch.ElapsedMilliseconds);
             }
             catch (RuntimeBinderException rbe)
             {
                 Console.WriteLine(rbe);
-                return new RpcResponse(null, true, ReadErrorResponse(response), (uint)latencyStopwatch.ElapsedMilliseconds);
+                return new RpcResponse(null, ReadErrorResponse(response), (uint)latencyStopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return new RpcResponse(null, true, unknownError, 0);
+                return new RpcResponse(null, Errors.UnknownError, (uint)latencyStopwatch.ElapsedMilliseconds);
             }
             finally
             {
@@ -75,45 +75,77 @@ namespace NearCompanion.Server.Services
             }
         }
 
-        private string ReadErrorResponse(dynamic? response)
+        private Errors ReadErrorResponse(dynamic? response)
         {
             try
             {
                 if (response != null)
                 {
-                    return response.error.cause.name;
+                    switch (response.error.cause.name)
+                    {
+                        case "UNKNOWN_BLOCK":
+                        {
+                            return Errors.UnknownBlock;
+                        }
+
+                        case "NOT_SYNCED_YET":
+                        {
+                            return Errors.NotSyncedYet;
+                        }
+
+                        case "PARSE_ERROR":
+                        {
+                            return Errors.ParseError;
+                        }
+
+                        case "INTERNAL_ERROR":
+                        {
+                            return Errors.InternalError;
+                        }
+
+                        default:
+                        {
+                            return Errors.UnknownError;
+                        }
+                    }
                 }
                 else
                 {
-                    return nullError;
+                    return Errors.NullResponse;
                 }
-            }
-            catch (RuntimeBinderException rbe)
-            {
-                Console.WriteLine(rbe);
-                return unableError;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return unknownError;
+                return Errors.UnknownError;
             }
         }
     }
 
     public class RpcResponse
     {
-        public RpcResponse(dynamic? result, bool isError, string errorMessage, uint latency)
+        public RpcResponse(dynamic? data, Errors result, uint latency)
         {
-            Result = result;
-            IsError = isError;
-            ErrorMessage = errorMessage;
+            Result = data;
             Latency = latency;
+            RpcResult = result;
         }
 
-        public bool IsError { get; } = false;
-        public string ErrorMessage { get; } = string.Empty;
         public dynamic? Result { get; } = null;
         public uint Latency { get; }
+        public bool IsError => RpcResult != Errors.None;
+        public Errors RpcResult { get; }
+        public string ErrorMessage
+        {
+            get
+            {
+                if (RpcResult == Errors.None)
+                {
+                    return string.Empty;
+                }    
+
+                return EnumExtensions.GetEnumDescription(RpcResult);
+            }
+        }
     }
 }

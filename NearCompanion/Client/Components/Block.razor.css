@@ -5,11 +5,12 @@
     }
 
     50% {
-        transform: translateX(10%)
+        transform: translateX(10%);
+        opacity: 0.74;
     }
 
     75% {
-        transform: translateX(-5%)
+        transform: translateX(-1%)
     }
 
     100% {

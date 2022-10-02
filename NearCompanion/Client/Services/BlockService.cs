@@ -4,6 +4,16 @@ using System.Net.Http.Json;
 
 namespace NearCompanion.Client.Services
 {
+    public class NewBlocksReceivedEventArgs : EventArgs
+    {
+        public NewBlocksReceivedEventArgs(List<BlockModel> blocks)
+        {
+            Blocks = blocks;
+        }
+
+        public List<BlockModel> Blocks { get; set; } = null;
+    }
+
     public class BlockService : IBlockService
     {
         public BlockService(HttpClient http)
@@ -14,7 +24,7 @@ namespace NearCompanion.Client.Services
         private HttpClient httpClient;
         private bool keepQueryingBlocks = true;
 
-        public event EventHandler<List<BlockModel>>? NewBlocksReceivedEvent;
+        public event EventHandler<NewBlocksReceivedEventArgs>? NewBlocksReceivedEvent;
 
         public async Task StartReceivingBlocks()
         {
@@ -30,28 +40,39 @@ namespace NearCompanion.Client.Services
 
             ulong previousHeight = finalBlockResponse.Data.Height + 1;
 
-            NewBlocksReceivedEvent?.Invoke(null, new List<BlockModel>() { finalBlockResponse.Data });
+            NewBlocksReceivedEvent?.Invoke(null, new NewBlocksReceivedEventArgs(new List<BlockModel>() { finalBlockResponse.Data }));
 
             while (keepQueryingBlocks)
             {
+                Console.WriteLine($"Polling blocks after height: {previousHeight}");
+
                 var latestBlocksResponse = await httpClient.GetFromJsonAsync<Response<List<BlockModel>>>($"block/{previousHeight}");
 
                 if (latestBlocksResponse == null || 
-                    !latestBlocksResponse.Success || 
-                    latestBlocksResponse.Data == null || 
-                    latestBlocksResponse.Data.Count == 0)
+                    latestBlocksResponse.Data == null)
                 {
+                    Console.WriteLine($"Received no blocks response...");
                     await Task.Delay(2000);
                     continue;
+                }
+                else if (!latestBlocksResponse.Success)
+                {
+                    if (latestBlocksResponse.Error == Errors.UnknownBlock)
+                    {
+                        previousHeight++;
+                        await Task.Delay(1000);
+                        continue;
+                    }
                 }
 
                 foreach (var newBlock in latestBlocksResponse.Data)
                 {
-                    //_ = AddBlockAndHandleAnimations(newBlock, (int)newBlock.LengthMs);
                     previousHeight++;
                 }
 
-                NewBlocksReceivedEvent?.Invoke(null, latestBlocksResponse.Data);
+                Console.WriteLine($"Received {latestBlocksResponse.Data.Count} blocks after height {previousHeight}");
+
+                NewBlocksReceivedEvent?.Invoke(null, new NewBlocksReceivedEventArgs(latestBlocksResponse.Data));
 
                 await Task.Delay(5000);
             }

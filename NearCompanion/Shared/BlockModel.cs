@@ -9,6 +9,7 @@
         public ulong GasPrice { get; set; }
         public decimal UtilizationPercentage { get; set; }
         public ulong TimestampMs { get; set; }
+        public Errors BlockError { get; set; }
 
         public List<ChunkModel> Chunks { get; set; } = new List<ChunkModel>();
     }

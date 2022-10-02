@@ -4,7 +4,7 @@ namespace NearCompanion.Client.Services.Interfaces
 {
     public interface IBlockService
     {
-        event EventHandler<List<BlockModel>> NewBlocksReceivedEvent;
+        event EventHandler<NewBlocksReceivedEventArgs> NewBlocksReceivedEvent;
 
         Task StartReceivingBlocks();
         Task StopReceivingBlocks();

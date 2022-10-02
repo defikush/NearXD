@@ -95,7 +95,8 @@ main {
     box-shadow: 5px 19px 15px -5px rgba(0,0,0,0.15);*/
     /*background: radial-gradient( circle farthest-corner at 7.2% 13.6%, #e1e5f2 0%, #e1e1f2 100% );*/
     background: #e6e9ff;
-    box-shadow: 0px 10px 50px #abb7e9;
+    /*box-shadow: 0px 10px 50px #abb7e9;*/
+    box-shadow: 0 12px 16px 0 #CAE6FF, 0 17px 50px 0 #CAE6FF;
 }
 
 .hoverable:hover {
