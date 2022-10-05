@@ -45,19 +45,10 @@ else
             }
         </div>
     </div>
-
-    @*<ol type="1">
-        @for (var i = 0; i <= number; i++)
-        {
-            <li>@word + " " + @i</li>
-        }
-    </ol>*@
 }
 
 @code 
 {
-    private int number = 4;
-    private string word = "asdsa";
     private List<BlockModel> blocks = new List<BlockModel>();
     private ObservableCollection<BlockModel> blocksQueue = new ObservableCollection<BlockModel>();
 
@@ -92,24 +83,38 @@ else
             dequeuingBlocks = true;
             Console.WriteLine($"Currently {blocksQueue.Count} blocks are in queue");
 
-            // Getting too behind
-            if (blocksQueue.Count > 15)
+            try
             {
-                blocks.AddRange(blocksQueue.Take(14));
-
-                foreach (var block in blocksQueue.Take(14))
+                // Getting too behind
+                if (blocksQueue.Count > 10)
                 {
-                    blocksQueue.Remove(block);
-                }
+                    lock (blocksQueue)
+                    {
+                        blocks.AddRange(blocksQueue.Take(9));
 
-                AnnounceStateHasChanged();
-                
-                continue;
+                        foreach (var block in blocksQueue.ToList().Take(9))
+                        {
+                            blocksQueue.Remove(block);
+                        }
+                    }
+
+                    AnnounceStateHasChanged();
+
+                    continue;
+                }
             }
-            
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
             _ = AddBlockAndHandleAnimations(blocksQueue.First());
-            await Task.Delay((int)blocksQueue.First().LengthMs);
-            blocksQueue.RemoveAt(0);
+            await Task.Delay((int)blocksQueue.First().LengthMs - 100);
+
+            lock (blocksQueue)
+            {
+                blocksQueue.RemoveAt(0);
+            }
         }
 
         dequeuingBlocks = false;

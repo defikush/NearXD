@@ -19,16 +19,16 @@ namespace NearCompanion.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<Response<BlockModel>>> GetIntroductionBlock()
         {
-            var introductionBlock = blockService.GetIntroductionBlock();
-            return Ok(introductionBlock);
+            var introductionBlockResponse = blockService.GetIntroductionBlock();
+            return Ok(introductionBlockResponse);
         }
 
         [HttpGet("{afterHeight}")]
         public async Task<ActionResult<Response<List<BlockModel>>>> GetLatestBlocks(ulong afterHeight)
         {
             var operationResult = Errors.None;
-            var blocks = blockService.GetLatestBlocks(afterHeight, ref operationResult);
-            return Ok(new Response<List<BlockModel>>() { Data = blocks, Error = operationResult });
+            var latestBlocksResponse = blockService.GetLatestBlocks(afterHeight, ref operationResult);
+            return Ok(latestBlocksResponse);
         }
     }
 }

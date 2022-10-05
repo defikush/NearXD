@@ -57,6 +57,8 @@ namespace NearCompanion.Client.Services
                 }
                 else if (!latestBlocksResponse.Success)
                 {
+                    Console.WriteLine($"Latest blocks response returned error {latestBlocksResponse.Error}...");
+
                     if (latestBlocksResponse.Error == Errors.UnknownBlock)
                     {
                         previousHeight++;

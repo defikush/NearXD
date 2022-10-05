@@ -234,7 +234,6 @@ namespace NearCompanion.Server.Services
             {
                 return new Response<BlockModel>()
                 {
-                    Data = blocks[blocks.Count - 5],
                     Error = Errors.NoBlocks
                 };
             }
@@ -255,17 +254,33 @@ namespace NearCompanion.Server.Services
             }
         }
 
-        public List<BlockModel> GetLatestBlocks(ulong afterHeight, ref Errors result)
+        public Response<List<BlockModel>> GetLatestBlocks(ulong afterHeight, ref Errors result)
         {
             if (blocks.FirstOrDefault(b => b.Height == afterHeight) is var rootBlock && 
                 rootBlock != null)
             {
                 var rootIndex = blocks.IndexOf(rootBlock);
-                return blocks.ToList().GetRange(rootIndex, blocks.Count - rootIndex - 1);
+                var latestBlocks = blocks.ToList().GetRange(rootIndex, blocks.Count - rootIndex - 1);
+
+                return new Response<List<BlockModel>>()
+                {
+                    Data = latestBlocks,
+                };
+            }
+            else if (afterHeight < blocks.First().Height)
+            {
+                return new Response<List<BlockModel>>()
+                {
+                    Data = new List<BlockModel>(),
+                    Error = Errors.PrunedBlock
+                };
             }
 
-            result = Errors.UnknownBlock;
-            return new List<BlockModel>();
+            return new Response<List<BlockModel>>()
+            {
+                Data = new List<BlockModel>(),
+                Error = Errors.UnknownBlock
+            };
         }
 
         private void Blocks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -5,7 +5,7 @@
         public T? Data { get; set; }
         public bool Success => Error == Errors.None;
         public string Message { get; set; } = string.Empty;
-        public Errors Error = Errors.None;
+        public Errors Error { get; set; } = Errors.None;
     }
 
     public enum Errors
@@ -26,6 +26,7 @@
 
         //Internal Errors
         NoBlocks = 200,
-        NotEnoughBlocks = 201
+        NotEnoughBlocks = 201,
+        PrunedBlock = 202
     }
 }
