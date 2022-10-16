@@ -11,7 +11,7 @@ namespace NearCompanion.Client.Services
             Blocks = blocks;
         }
 
-        public List<BlockModel> Blocks { get; set; } = null;
+        public List<BlockModel>? Blocks { get; set; } = null;
     }
 
     public class BlockService : IBlockService
@@ -44,7 +44,7 @@ namespace NearCompanion.Client.Services
 
             while (keepQueryingBlocks)
             {
-                Console.WriteLine($"Polling blocks after height: {previousHeight}");
+                //Console.WriteLine($"Polling blocks after height: {previousHeight}");
 
                 var latestBlocksResponse = await httpClient.GetFromJsonAsync<Response<List<BlockModel>>>($"block/{previousHeight}");
 
@@ -72,7 +72,7 @@ namespace NearCompanion.Client.Services
                     previousHeight++;
                 }
 
-                Console.WriteLine($"Received {latestBlocksResponse.Data.Count} blocks after height {previousHeight}");
+                //Console.WriteLine($"Received {latestBlocksResponse.Data.Count} blocks after height {previousHeight}");
 
                 NewBlocksReceivedEvent?.Invoke(null, new NewBlocksReceivedEventArgs(latestBlocksResponse.Data));
 

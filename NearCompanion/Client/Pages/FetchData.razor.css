@@ -11,7 +11,7 @@
 
 .rightShift 
 {
-    animation: 0.27s linear 0s 1 moveBlocksRightAnimation;
+    animation: 0.25s linear 0s 1 moveBlocksRightAnimation;
 }
 
 .blocksContainer {

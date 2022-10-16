@@ -1,12 +1,10 @@
 ﻿@keyframes initializeBlockAnimation {
     0% {
         transform: translateX(-100%);
-        opacity: 0;
     }
 
     50% {
         transform: translateX(10%);
-        opacity: 0.74;
     }
 
     75% {
@@ -15,13 +13,12 @@
 
     100% {
         transform: translateX(0);
-        opacity: 1;
     }
 }
 
 .intialShift 
 {
-    animation: 0.25s ease-in 0s 1 initializeBlockAnimation;
+    animation: 0.25s ease-in 0.25s 1 initializeBlockAnimation;
 }
 
 .block {

@@ -10,8 +10,10 @@
 @using System.Collections.Specialized
 @inject HttpClient Http
 @inject IBlockService BlockService
+@inject DialogService DialogService
 
 <PageTitle>Weather forecast</PageTitle>
+<RadzenDialog />
 
 @if (blocks == null)
 {
@@ -64,7 +66,7 @@ else
     {
         blocksQueue.CollectionChanged += OnBlockQueueChanged; 
         BlockService.NewBlocksReceivedEvent += OnNewBlocksReceived;
-        await BlockService.StartReceivingBlocks();
+        _ = BlockService.StartReceivingBlocks();
     }
 
     private void OnBlockQueueChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -78,46 +80,55 @@ else
 
     private async Task DequeBlocks()
     {
-        while (blocksQueue.Count > 0)
+        await Task.Run(async () =>
         {
-            dequeuingBlocks = true;
-            Console.WriteLine($"Currently {blocksQueue.Count} blocks are in queue");
-
-            try
+            if (dequeuingBlocks)
             {
-                // Getting too behind
-                if (blocksQueue.Count > 10)
+                return;
+            }
+
+            while (blocksQueue.Count > 0)
+            {
+                dequeuingBlocks = true;
+                //Console.WriteLine($"Currently {blocksQueue.Count} blocks are in queue");
+
+                try
                 {
-                    lock (blocksQueue)
+                    // Getting too behind
+                    if (blocksQueue.Count > 10)
                     {
-                        blocks.AddRange(blocksQueue.Take(9));
-
-                        foreach (var block in blocksQueue.ToList().Take(9))
+                        lock (blocksQueue)
                         {
-                            blocksQueue.Remove(block);
+                            blocks.AddRange(blocksQueue.Take(9));
+
+                            foreach (var block in blocksQueue.ToList().Take(9))
+                            {
+                                blocksQueue.Remove(block);
+                            }
                         }
+
+                        AnnounceStateHasChanged();
+
+                        continue;
                     }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
 
-                    AnnounceStateHasChanged();
+                _ = AddBlockAndHandleAnimations(blocksQueue.First());
+                await Task.Delay((int)blocksQueue.First().LengthMs - 100);
 
-                    continue;
+                lock (blocksQueue)
+                {
+                    blocksQueue.RemoveAt(0);
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
 
-            _ = AddBlockAndHandleAnimations(blocksQueue.First());
-            await Task.Delay((int)blocksQueue.First().LengthMs - 100);
-
-            lock (blocksQueue)
-            {
-                blocksQueue.RemoveAt(0);
-            }
-        }
-
-        dequeuingBlocks = false;
+            dequeuingBlocks = false;
+        
+        });
     }
 
     private void OnNewBlocksReceived(object? sender, NewBlocksReceivedEventArgs e)
@@ -139,15 +150,14 @@ else
         await Task.Delay(250);
 
         blocks.Add(block);
-        AnnounceStateHasChanged();
         isInsertingNewBlock = false;
-        AnnounceStateHasChanged();
 
         if (blocks.Count > 10)
         {
             blocks.RemoveAt(0);
-            AnnounceStateHasChanged();
         }
+
+        AnnounceStateHasChanged();
     }
 
     private void HandlePlayPause()

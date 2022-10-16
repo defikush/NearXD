@@ -13,10 +13,4 @@
 
         public List<ChunkModel> Chunks { get; set; } = new List<ChunkModel>();
     }
-
-    public class ChunkModel
-    {
-        public uint ShardId { get; set; }
-        public decimal UtilizationPercentage { get; set; }
-    }
 }
