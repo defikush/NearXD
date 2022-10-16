@@ -90,12 +90,11 @@ else
             while (blocksQueue.Count > 0)
             {
                 dequeuingBlocks = true;
-                //Console.WriteLine($"Currently {blocksQueue.Count} blocks are in queue");
 
                 try
                 {
-                    // Getting too behind
-                    if (blocksQueue.Count > 10)
+                // Getting too behind
+                if (blocksQueue.Count > 10)
                     {
                         lock (blocksQueue)
                         {
@@ -127,7 +126,7 @@ else
             }
 
             dequeuingBlocks = false;
-        
+
         });
     }
 
@@ -154,7 +153,7 @@ else
 
         if (blocks.Count > 10)
         {
-            blocks.RemoveAt(0);
+            blocks.RemoveRange(0, blocks.Count - 10);
         }
 
         AnnounceStateHasChanged();
