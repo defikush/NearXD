@@ -18,7 +18,7 @@
 
 .intialShift 
 {
-    animation: 0.25s ease-in 0.25s 1 initializeBlockAnimation;
+    animation: 0.25s ease-in 0s 1 initializeBlockAnimation;
 }
 
 .block {

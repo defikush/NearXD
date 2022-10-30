@@ -134,6 +134,11 @@ else
     {
         lock (blocksQueue)
         {
+            if (blocks is null)
+            {
+                return;
+            }
+
             foreach (var newBlock in e.Blocks)
             {
                 blocksQueue.Add(newBlock);

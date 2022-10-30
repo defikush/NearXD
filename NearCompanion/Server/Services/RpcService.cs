@@ -88,6 +88,16 @@ namespace NearCompanion.Server.Services
                             return Errors.UnknownBlock;
                         }
 
+                        case "UNKNOWN_CHUNK":
+                        {
+                            return Errors.UnknownChunk;
+                        }
+
+                        case "INVALID_SHARD_ID":
+                        {
+                            return Errors.InvalidShardId;
+                        }
+
                         case "NOT_SYNCED_YET":
                         {
                             return Errors.NotSyncedYet;

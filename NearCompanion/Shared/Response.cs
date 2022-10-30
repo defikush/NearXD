@@ -23,6 +23,8 @@
 
         //Block Errors
         UnknownBlock = 100,
+        UnknownChunk = 101,
+        InvalidShardId = 102,
 
         //Internal Errors
         NoBlocks = 200,

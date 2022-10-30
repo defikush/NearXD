@@ -14,6 +14,7 @@ namespace NearCompanion.Shared
         public string Hash { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public decimal UtilizationPercentage { get; set; }
+        public Errors ChunkError { get; set; }
 
         public List<TransactionModel> Transactions { get; set; } = new List<TransactionModel>();
         public List<ReceiptModel> Receipts { get; set; } = new List<ReceiptModel>();
@@ -33,6 +34,8 @@ namespace NearCompanion.Shared
         public ActionKind Kind { get; set; }
         public string MethodName { get; set; } = string.Empty;
         public double Deposit { get; set; }
+        public string AccessKeyPermission { get; set; } = string.Empty;
+        public string PublicKey { get; set; } = string.Empty;
     }
 
     public class ReceiptModel
