@@ -6,11 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 IRpcService rpcService = new RpcService();
 IBlockService blockService = new BlockService(rpcService);
+IChunkService chunkService = new ChunkService(rpcService);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<IRpcService>(rpcs => rpcService);
 builder.Services.AddSingleton<IBlockService>(bs => blockService);
+builder.Services.AddSingleton<IChunkService>(cs => chunkService);
 
 var app = builder.Build();
 

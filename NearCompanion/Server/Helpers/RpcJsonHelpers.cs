@@ -39,6 +39,7 @@
         {
             return LeftBracket                       +
                    JsonRpcVersion            + Comma +
+                   RequestId                 + Comma +
                    ChunkMethod               + Comma +
                    ChunkParams(chunkId, blockHeight) +
                    RightBracket;

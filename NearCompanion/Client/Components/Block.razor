@@ -15,7 +15,7 @@
             {
                 foreach (var chunk in Model.Chunks)
                 {
-                    <button class="chunkButton hoverableButtonBlack" type="button">
+                    <button class="chunkButton hoverableButtonBlack" type="button" @onclick="@(e => HandleChunkClick((int)chunk.ShardId, Model.Height))" >
                         <p class="chunkId">Chunk @chunk.ShardId</p>
                         <p class="chunkFullness">@chunk.UtilizationPercentage% full</p>
                     </button>

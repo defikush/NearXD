@@ -76,6 +76,8 @@ namespace NearCompanion.Server.Services
                 {
                     transactionModel.Actions.Add(ReadAction(action));
                 }
+
+                chunk.Transactions.Add(transactionModel);
             }
 
             //TODO read receipts
@@ -93,6 +95,7 @@ namespace NearCompanion.Server.Services
                 actionModel.MethodName = action.FunctionCall.method_name;
                 actionModel.Deposit = action.FunctionCall.deposit;
                 actionModel.Kind = ActionKind.FunctionCall;
+                return actionModel;
             }
             catch (Exception) { }
 
@@ -101,6 +104,7 @@ namespace NearCompanion.Server.Services
             {
                 actionModel.Deposit = action.Transfer.deposit;
                 actionModel.Kind = ActionKind.Transfer;
+                return actionModel;
             }
             catch (Exception) { }
 
@@ -111,14 +115,18 @@ namespace NearCompanion.Server.Services
                 actionModel.AccessKeyPermission = action.AddKey.access_key.permission;
                 actionModel.PublicKey = action.AddKey.public_key;
                 actionModel.Kind = ActionKind.AddKey;
+                return actionModel;
             }
             catch (Exception) { }
 
             // CreateAccount
             try
             {
-                var createAccount = action.CreateAccount;
-                actionModel.Kind = ActionKind.CreateAccount;
+                if (action.CreateAccount != null)
+                {
+                    actionModel.Kind = ActionKind.CreateAccount;
+                    return actionModel;
+                }
             }
             catch (Exception) { }
 
@@ -127,30 +135,40 @@ namespace NearCompanion.Server.Services
             {
                 actionModel.PublicKey = action.DeleteKey.public_key;
                 actionModel.Kind = ActionKind.DeleteKey;
+                return actionModel;
             }
             catch (Exception) { }
 
             // DeployContract
             try
             {
-                var deploy = action.DeployContract;
-                actionModel.Kind = ActionKind.DeployContract;
+                if (action.DeployContract != null)
+                {
+                    actionModel.Kind = ActionKind.DeployContract;
+                    return actionModel;
+                }
             }
             catch (Exception) { }
 
             // DeleteAccount
             try
             {
-                var deleteAccount = action.DeleteAccount;
-                actionModel.Kind = ActionKind.DeleteAccount;
+                if (action.DeleteAccount != null)
+                {
+                    actionModel.Kind = ActionKind.DeleteAccount;
+                    return actionModel;
+                }
             }
             catch (Exception) { }
 
             //Stake
             try
             {
-                var stake = action.Stake;
-                actionModel.Kind = ActionKind.Stake;
+                if (action.Stake != null)
+                {
+                    actionModel.Kind = ActionKind.Stake;
+                    return actionModel;
+                }
             }
             catch (Exception) { }
 
