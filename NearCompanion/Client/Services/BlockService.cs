@@ -44,8 +44,6 @@ namespace NearCompanion.Client.Services
 
             while (keepQueryingBlocks)
             {
-                //Console.WriteLine($"Polling blocks after height: {previousHeight}");
-
                 var latestBlocksResponse = await httpClient.GetFromJsonAsync<Response<List<BlockModel>>>($"block/{previousHeight}");
 
                 if (latestBlocksResponse == null || 
@@ -71,8 +69,6 @@ namespace NearCompanion.Client.Services
                 {
                     previousHeight++;
                 }
-
-                //Console.WriteLine($"Received {latestBlocksResponse.Data.Count} blocks after height {previousHeight}");
 
                 NewBlocksReceivedEvent?.Invoke(null, new NewBlocksReceivedEventArgs(latestBlocksResponse.Data));
 
