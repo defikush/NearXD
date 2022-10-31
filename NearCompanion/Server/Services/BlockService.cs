@@ -79,11 +79,6 @@ namespace NearCompanion.Server.Services
 
                 while (keepPolling)
                 {
-                    if (blocks.Count >= 10)
-                    {
-                        keepPolling = false;
-                    }
-
                     BlockModel block = new BlockModel();
                     uint latency = 0;
 
@@ -135,7 +130,7 @@ namespace NearCompanion.Server.Services
             }
             finally
             {
-                //_ = Initialize();
+                _ = Initialize();
             }
         }
 
@@ -156,7 +151,7 @@ namespace NearCompanion.Server.Services
 
         private void HeightWatchdogElapsed(object? sender, ElapsedEventArgs e)
         {
-            //_ = ReadjustHeight();
+            _ = ReadjustHeight();
         }
 
         private async Task ReadjustHeight()
