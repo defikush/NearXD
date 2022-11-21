@@ -1,2 +1,15 @@
-﻿body {
+﻿.info-row 
+{
+    margin: 5px 0 5px 0;
+}
+
+.info-name 
+{
+    font-weight: bold;
+}
+
+.transactions-title
+{
+    font-size: 22px;
+    margin-top: 35px;
 }

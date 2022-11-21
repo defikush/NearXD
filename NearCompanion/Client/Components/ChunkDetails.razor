@@ -1,5 +1,45 @@
-﻿<h3>ChunkDetails</h3>
+﻿<div class="container">
+  <div class="row">
+    
+  </div>
 
-@code {
+  <div class="row">
+    <div class="col-3">
 
-}
+    </div>
+    <div class="col-9">
+            <div class="info-row">
+                <span class="info-name">🧬 Hash: </span>
+                <span>@Model?.Hash</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-name">🏁 Height Created: </span>
+                <span>@Model?.HeightCreated</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-name">⚓ Height Included: </span>
+                <span>@Model?.HeightIncluded</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-name">💼 Author: </span>
+                <span>@Model?.Author</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-name">⛽ Utilization: </span>
+                <span>@Model?.UtilizationPercentage %</span>
+            </div>
+    </div>
+  </div>
+
+  <div class="row">
+        <span class="text-center transactions-title">Transactions</span>
+  </div>
+
+  <div class="row">
+    
+  </div>
+</div>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NearCompanion.Client.Services.Interfaces;
 using NearCompanion.Shared;
+using Radzen.Blazor;
+using Radzen;
 
 namespace NearCompanion.Client.Components
 {
@@ -10,6 +12,9 @@ namespace NearCompanion.Client.Components
 
         [Inject]
         private IChunkService? chunkService { get; set; }
+
+        [Inject]
+        private DialogService? dialogService { get; set; }
 
         [Parameter]
         public BlockModel? Model { get; set; } = null;
@@ -43,24 +48,26 @@ namespace NearCompanion.Client.Components
             return authorTrimmed = string.IsNullOrEmpty(authorTrimmed) ? "unknown" : authorTrimmed;
         }
 
-        private async void HandleChunkClick(int id, ulong height)
+        private async Task HandleChunkClick(int id, ulong height)
         {
             try
             {
-                var result = await chunkService.GetChunk(id, height);
-                Console.WriteLine($"Received chunk: {result.ShardId} at height created {result.HeightCreated} and height included {result.HeightIncluded} with " +
-                    $"hash {result.Hash} and author {result.Author} and utilization {result.UtilizationPercentage} chunk error {result.ChunkError}");
-
-                foreach (var transaction in result.Transactions)
+                if (dialogService == null || chunkService == null)
                 {
-                    Console.WriteLine($"Transaction by signer: {transaction.SignerId} to {transaction.ReceiverId} and hash {transaction.Hash} with the following Actions:");
-
-                    foreach (var action in transaction.Actions)
-                    {
-                        Console.WriteLine($"~~~ Type: {action.Kind} method called: {action.MethodName} deposit: {action.Deposit}, " +
-                            $"access key permission: {action.AccessKeyPermission}, public key {action.PublicKey}");
-                    }
+                    return;
                 }
+
+                var chunk = await chunkService.GetChunk(id, height);
+
+                var result = await dialogService.OpenAsync<ChunkDetails>(
+                    $"Chunk {id}", 
+                    new Dictionary<string, object>() {{ "Model", chunk }}, 
+                    new DialogOptions()
+                    {
+                        Style = "border-radius: 25px; box-shadow: 3px 3px 0px 0px #5FB8FF, 0 12px 16px 0 #CAE6FF, 0 17px 50px 0 #CAE6FF; margin: 10px 50px 10px 10px;",
+                        Width = "1200px",
+                        Height = "700px"
+                    });
             }
             catch (Exception ex)
             {
