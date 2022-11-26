@@ -40,6 +40,12 @@
   </div>
 
   <div class="row">
-    
-  </div>
+        @if (Model != null)
+        {
+            @foreach (var transaction in Model.Transactions)
+            {
+                <TransactionItem Model="transaction" />
+            }
+        }
+    </div>
 </div>

@@ -1,0 +1,10 @@
+﻿.pill-name {
+    font-weight:200;
+}
+
+.pill {
+    border-radius: 100px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+}

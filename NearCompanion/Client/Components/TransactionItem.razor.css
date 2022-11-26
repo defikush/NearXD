@@ -1,0 +1,10 @@
+﻿.transaction-container {
+    background-color: #F3F3F3;
+    border-radius: 100px;
+    height: 55px;
+}
+
+.transaction-row {
+    display: flex;
+    align-items: center;
+}
