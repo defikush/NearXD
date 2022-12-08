@@ -10,9 +10,11 @@
         private static string RequestId => $"\"id\": \"{AppId}\"";
         private static string BlockMethod => "\"method\": \"block\"";
         private static string ChunkMethod => "\"method\": \"chunk\"";
+        private static string TxStatusMethod => "\"method\": \"EXPERIMENTAL_tx_status\"";
         private static string FinalBlock => "\"params\": { \"finality\": \"final\" }";
         private static string BlockHeight(ulong blockHeight) => $"\"params\": {{ \"block_id\": {blockHeight} }}";
         private static string ChunkParams(int chunkId, ulong blockHeight) => $"\"params\": {{ \"block_id\": {blockHeight}, \"shard_id\": {chunkId} }}";
+        private static string TxStatusParams(string hash, string account) => $"\"params\": [\"{hash}\", \"{account}\"]";
 
 
         public static string GetLatestFinalBlockJson()
@@ -44,6 +46,16 @@
                    ChunkParams(chunkId, blockHeight) +
                    RightBracket;
 
+        }
+
+        public static string GetTransactionJson(string hash, string account)
+        {
+            return LeftBracket +
+                   JsonRpcVersion        + Comma +
+                   RequestId             + Comma +
+                   TxStatusMethod        + Comma +
+                   TxStatusParams(hash, account) +
+                   RightBracket;
         }
     }
 }
