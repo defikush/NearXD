@@ -1,4 +1,6 @@
-﻿<div class="container">
+﻿@using NearCompanion.Shared;
+
+<div class="container">
   <div class="row">
     
   </div>
@@ -40,12 +42,23 @@
   </div>
 
   <div class="row">
-        @if (Model != null)
+        @*@if (Model != null)
         {
             @foreach (var transaction in Model.Transactions)
             {
                 <TransactionItem Model="transaction" />
             }
-        }
+        }*@
+
+        <RadzenDataGrid AllowFiltering="false" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="false" Data="@Model.Transactions" TItem="TransactionModel" ColumnWidth="200px" GridLines="DataGridGridLines.Vertical">
+            <Columns>
+                <RadzenDataGridColumn TItem="TransactionModel" Title="Actions" TextAlign="TextAlign.Center"/>
+                <RadzenDataGridColumn TItem="TransactionModel" Property="SignerId" Title="🔑 Signer" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="TransactionModel" Property="ReceiverId" Title="📪 Receiver" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="TransactionModel" Property="Hash" Title="🧬 Hash" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="TransactionModel" Title="" />
+            </Columns>
+        </RadzenDataGrid>
     </div>
 </div>
