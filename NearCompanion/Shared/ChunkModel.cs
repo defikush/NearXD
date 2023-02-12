@@ -16,11 +16,11 @@ namespace NearCompanion.Shared
         public decimal UtilizationPercentage { get; set; }
         public Errors ChunkError { get; set; }
 
-        public List<TransactionModel> Transactions { get; set; } = new List<TransactionModel>();
-        public List<ReceiptModel> Receipts { get; set; } = new List<ReceiptModel>();
+        public List<SimpleTransactionModel> Transactions { get; set; } = new List<SimpleTransactionModel>();
+        public List<SimpleReceiptModel> Receipts { get; set; } = new List<SimpleReceiptModel>();
     }
 
-    public class TransactionModel
+    public class SimpleTransactionModel
     {
         public string SignerId { get; set; } = string.Empty;
         public string ReceiverId { get; set; } = string.Empty;
@@ -38,7 +38,7 @@ namespace NearCompanion.Shared
         public string PublicKey { get; set; } = string.Empty;
     }
 
-    public class ReceiptModel
+    public class SimpleReceiptModel
     {
         public string PredecessorId { get; set; } = string.Empty;
         public string ReceiverId { get; set; } = string.Empty;

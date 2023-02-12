@@ -43,7 +43,7 @@
 
   <div class="row">
         <RadzenDataGrid AllowFiltering="false" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                        AllowSorting="false" Data="@Model?.Transactions" TItem="TransactionModel" GridLines="DataGridGridLines.Vertical"
+                        AllowSorting="false" Data="@Model?.Transactions" TItem="SimpleTransactionModel" GridLines="DataGridGridLines.Vertical"
                         style="padding-left: 0px;padding-right: 0px; border-radius: 0px 0px 10px 10px"> @*Id or class style not working properly*@
             <EmptyTemplate>
                 <p class="gray-hint">No transactions were generated in this chunk</p>

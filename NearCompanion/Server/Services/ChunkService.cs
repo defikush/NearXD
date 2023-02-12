@@ -66,7 +66,7 @@ namespace NearCompanion.Server.Services
 
             foreach (var transaction in result.transactions)
             {
-                var transactionModel = new TransactionModel();
+                var transactionModel = new SimpleTransactionModel();
 
                 transactionModel.SignerId = transaction.signer_id;
                 transactionModel.ReceiverId = transaction.receiver_id;
