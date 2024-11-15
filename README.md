@@ -44,13 +44,13 @@ Here are some cool things that it does:
 [BlazorLogo]: Resources/BlazorLogo.png
 [RadzenLogo]: Resources/RadzenLogo.png
 
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/defikush/NearCompanion.svg?style=for-the-badge
 [contributors-url]: https://github.com/defikush/NearCompanion
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/contributors/defikush/NearCompanion.svg?style=for-the-badge
 [forks-url]: https://github.com/defikush/NearCompanion/forks
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/contributors/defikush/NearCompanion.svg?style=for-the-badge
 [stars-url]: https://github.com/defikush/NearCompanion
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/contributors/defikush/NearCompanion.svg?style=for-the-badge
 [issues-url]: https://github.com/defikush/NearCompanion/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/contributors/defikush/NearCompanion.svg?style=for-the-badge
 [license-url]: https://github.com/defikush/NearCompanion
