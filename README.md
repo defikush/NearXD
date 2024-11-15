@@ -33,9 +33,9 @@ Here are some cool things that it does:
 
 ### Built With
 
-* ![ASP.NET Core 6][AspNetLogo]
-* ![Blazor][BlazorLogo]
-* ![Radzen][RadzenLogo]
+* <img src="Resources/AspNetLogo.png" width="100">
+* <img src="Resources/BlazorLogo.png" width="100">
+* <img src="Resources/RadzenLogo.png" width="100">
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
